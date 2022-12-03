@@ -9,9 +9,11 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "chrome-aws-lambda": "^10.1.0",
     "eslint": "8.29.0",
     "eslint-config-next": "13.0.6",
     "next": "13.0.6",
+    "playwright-core": "^1.28.1",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   }
