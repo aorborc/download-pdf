@@ -1,27 +1,33 @@
-import chromium from "chrome-aws-lambda";
-import playwright from "playwright-core";
+import chrome from "chrome-aws-lambda";
+import puppeteer from "puppeteer-core";
 
 export default async function generatePdf(req, res) {
   try {
-    const browser = await playwright.chromium.launch({
-      args: [...chromium.args, "--font-render-hinting=none"], // This way fix rendering issues with specific fonts
-      executablePath:
-        process.env.NODE_ENV === "production"
-          ? await chromium.executablePath
-          : "/opt/homebrew/bin/chromium",
-      headless:
-        process.env.NODE_ENV === "production" ? chromium.headless : true,
-    });
-    const context = await browser.newContext();
-    const page = await context.newPage();
+    const options = process.env.AWS_REGION
+    ? {
+        args: chrome.args,
+        executablePath: await chrome.executablePath,
+        headless: chrome.headless
+      }
+    : {
+        args: [],
+        executablePath:
+          process.platform === 'win32'
+            ? 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe'
+            : process.platform === 'linux'
+            ? '/usr/bin/google-chrome'
+            : '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+      };
+    const browser = await puppeteer.launch(options);
+    const page = await browser.newPage();
     // This is the path of the url which shall be converted to a pdf file
     const pdfUrl = req.query.url || "https://aorborc.com";
     //timeout is set to 30 seconds, change to 0 to disable timeout
     await page.goto(pdfUrl, {
-      waitUntil: "domcontentloaded",
+      waitUntil: "networkidle0",
       timeout: 30000,
     });
-    const path = `${Date.now()}.pdf`;
+    const path = `/tmp/${Date.now()}.pdf`;
     const pdf = await page.pdf({
       path, 
       printBackground: true,
