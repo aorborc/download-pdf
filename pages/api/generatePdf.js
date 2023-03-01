@@ -23,13 +23,16 @@ export default async function generatePdf(req, res) {
     // This is the path of the url which shall be converted to a pdf file
     const pdfUrl = req.query.url || "https://aorborc.com";
     //timeout is set to 30 seconds, change to 0 to disable timeout
+    console.log(pdfUrl);
+   console.log(req.query.landscape);
     await page.goto(pdfUrl, {
       waitUntil: "networkidle0",
       timeout: 30000,
     });
     const path = `/tmp/${Date.now()}.pdf`;
     const pdf = await page.pdf({
-      path, 
+      landscape: req.query.landscape?true:false,
+      path,
       printBackground: true,
       format: "a4",
     });
