@@ -27,7 +27,7 @@ export default async function generatePdf(req, res) {
    console.log(req.query.landscape);
     await page.goto(pdfUrl, {
       waitUntil: "networkidle0",
-      timeout: 30000,
+      timeout: 60000,
     });
     const path = `/tmp/${Date.now()}.pdf`;
     const pdf = await page.pdf({
