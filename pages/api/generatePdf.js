@@ -2,12 +2,13 @@ import chrome from "chrome-aws-lambda";
 import puppeteer from "puppeteer-core";
 
 export default async function generatePdf(req, res) {
+  let browser = null;
   try {
     const options = process.env.AWS_REGION
     ? {
-        args: chrome.args,
-        executablePath: await chrome.executablePath,
-        headless: chrome.headless
+      args: [...chrome.args, '--no-sandbox', '--disable-setuid-sandbox'],
+      executablePath: await chrome.executablePath,
+      headless: chrome.headless
       }
     : {
         args: [],
@@ -18,7 +19,8 @@ export default async function generatePdf(req, res) {
             ? '/usr/bin/google-chrome'
             : '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
       };
-    const browser = await puppeteer.launch(options);
+      // console.log(options)
+     browser = await puppeteer.launch(options);
     const page = await browser.newPage();
     // This is the path of the url which shall be converted to a pdf file
     const pdfUrl = req.query.url || "https://aorborc.com";
