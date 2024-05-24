@@ -1,17 +1,19 @@
-import chrome from "chrome-aws-lambda";
+const chrome = require('@sparticuz/chromium');
 import puppeteer from "puppeteer-core";
-
+const production = process.env.NODE_ENV === 'production';
 export default async function generatePdf(req, res) {
   let browser = null;
   try {
-    const options = process.env.AWS_REGION
+    const options = production
     ? {
-      args: [...chrome.args, '--no-sandbox', '--disable-setuid-sandbox'],
-      executablePath: await chrome.executablePath,
-      headless: chrome.headless
+      args: chrome.args,
+        defaultViewport: chrome.defaultViewport,
+        executablePath: await chrome.executablePath(),
+        headless: 'new',
+        ignoreHTTPSErrors: true
       }
     : {
-        args: [],
+      headless: 'new',
         executablePath:
           process.platform === 'win32'
             ? 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe'
