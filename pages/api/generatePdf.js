@@ -2,6 +2,7 @@ const chrome = require('@sparticuz/chromium');
 import puppeteer from "puppeteer-core";
 const production = process.env.NODE_ENV === 'production';
 export default async function generatePdf(req, res) {
+  req.setTimeout(300000);
   let browser = null;
   try {
     const options = production
